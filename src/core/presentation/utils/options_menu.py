@@ -4,6 +4,7 @@ import dataclasses
 from collections.abc import Callable, Generator
 
 
+# TODO: Rename to OptionsBuilder
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class OptionsMenu:
     options: list[Option]

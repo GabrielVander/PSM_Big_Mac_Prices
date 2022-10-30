@@ -56,7 +56,7 @@ class TestOptionsMenu:
         assert amount_of_options > 0
         assert target in range(1, amount_of_options + 1)
 
-        dummy_func: Callable[[], None] = self._decoy.mock(func=Callable[[], None])
+        dummy_func: Callable[[], None] = self._decoy.mock(func=Callable[[], None])  # type: ignore
         options: list[Option] = [
             Option(
                 display_message=f'Option #{i + 1}',
@@ -94,7 +94,7 @@ class TestOptionsMenu:
     ) -> None:
         assert target not in range(1, amount_of_options + 1)
 
-        dummy_func: Callable[[], None] = self._decoy.mock(func=Callable[[], None])
+        dummy_func: Callable[[], None] = self._decoy.mock(func=Callable[[], None])  # type: ignore
         options: list[Option] = [
             Option(display_message=f'Option #{i + 1}', on_select=dummy_func) for i in range(amount_of_options)
         ]
