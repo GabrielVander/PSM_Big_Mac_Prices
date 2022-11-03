@@ -37,5 +37,3 @@ p
 @tests/unit_tests/core/presentation/utils/test_user_input_menu.py,7/0/700c21ab82ad252c91091c158c18515487127d64
 R
 "src/core/presentation/main_menu.py,f/d/fd6983aa63e0011644cfd3f140899e221d62e39c
-m
-=src/features/statistics/domain/entities/statistics_failure.py,1/4/14623b449cb51e16f019606bbed2487857fae880
