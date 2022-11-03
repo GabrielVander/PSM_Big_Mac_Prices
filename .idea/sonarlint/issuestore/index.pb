@@ -25,3 +25,17 @@ Q
 src/__init__.py,b/1/b141e8a708cfc0de96ab25c59ca83087cbddf7fa
 @
 requirements.txt,1/9/19359a61ae2446b51b549167b014da2fcf265768
+[
++src/core/presentation/utils/options_menu.py,a/2/a249754eb03118dfc5e2d7764e3c4e9f28a84776
+m
+=tests/unit_tests/core/presentation/utils/test_options_menu.py,6/9/69da03727594101e1b34baac49966b8ac7118f11
+d
+4tests/unit_tests/core/presentation/test_main_menu.py,5/7/5701859f4ba24857bb0039a3bac566e038ffd9d3
+^
+.src/core/presentation/utils/user_input_menu.py,9/d/9d816bf0157b906c36de6dfd5f14ebabf84a2b69
+p
+@tests/unit_tests/core/presentation/utils/test_user_input_menu.py,7/0/700c21ab82ad252c91091c158c18515487127d64
+R
+"src/core/presentation/main_menu.py,f/d/fd6983aa63e0011644cfd3f140899e221d62e39c
+m
+=src/features/statistics/domain/entities/statistics_failure.py,1/4/14623b449cb51e16f019606bbed2487857fae880
