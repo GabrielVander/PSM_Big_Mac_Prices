@@ -6,11 +6,11 @@ from src.core.domain.entities.price_entry import PriceEntry
 from src.core.utils.result import Result
 
 
-class LoadFromCsvUseCase:
+class LoadPricesUseCase:
 
-    async def execute(self) -> Result[list[PriceEntry], LoadFromCsvUseCaseFailure]:
+    async def execute(self) -> Result[list[PriceEntry], LoadPricesUseCaseFailure]:
         pass
 
 
-class LoadFromCsvUseCaseFailure(abc.ABC):
+class LoadPricesUseCaseFailure(abc.ABC):
     pass

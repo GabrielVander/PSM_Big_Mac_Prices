@@ -7,9 +7,9 @@ import typing
 
 from src.core.domain.entities.price_entry import PriceEntry
 from src.core.utils.result import Error, Ok, Result
-from src.features.price_provisioning.domain.use_cases.load_from_csv_use_case import (
-    LoadFromCsvUseCase,
-    LoadFromCsvUseCaseFailure,
+from src.features.price_provisioning.domain.use_cases.load_prices_use_case import (
+    LoadPricesUseCase,
+    LoadPricesUseCaseFailure,
 )
 
 
@@ -18,29 +18,29 @@ class PriceProvisioningControllerFailure(abc.ABC):
 
 
 class PriceProvisioningController:
-    _load_from_csv_use_case: LoadFromCsvUseCase
+    _load_prices_use_case: LoadPricesUseCase
 
-    def __init__(self, load_from_csv_use_case: LoadFromCsvUseCase) -> None:
-        self._load_from_csv_use_case = load_from_csv_use_case
+    def __init__(self, load_prices_use_case: LoadPricesUseCase) -> None:
+        self._load_prices_use_case = load_prices_use_case
 
     async def provision_prices(self) -> Result[ProvisionedPricesViewModel, PriceProvisioningControllerFailure]:
-        prices_result: Result[list[PriceEntry], LoadFromCsvUseCaseFailure] = \
-            await self._load_from_csv_use_case.execute()
+        prices_result: Result[list[PriceEntry], LoadPricesUseCaseFailure] = \
+            await self._load_prices_use_case.execute()
 
         if prices_result.is_ok():
-            prices_ok_result: Ok[list[PriceEntry], LoadFromCsvUseCaseFailure] = typing.cast(
-                Ok[list[PriceEntry], LoadFromCsvUseCaseFailure],
+            prices_ok_result: Ok[list[PriceEntry], LoadPricesUseCaseFailure] = typing.cast(
+                Ok[list[PriceEntry], LoadPricesUseCaseFailure],
                 prices_result
             )
 
             return Result.ok(self._to_view_model(prices_ok_result.value))
 
-        prices_err_result: Error[list[PriceEntry], LoadFromCsvUseCaseFailure] = typing.cast(
-            Error[list[PriceEntry], LoadFromCsvUseCaseFailure],
+        prices_err_result: Error[list[PriceEntry], LoadPricesUseCaseFailure] = typing.cast(
+            Error[list[PriceEntry], LoadPricesUseCaseFailure],
             prices_result
         )
 
-        failure: LoadFromCsvUseCaseFailure = prices_err_result.value
+        failure: LoadPricesUseCaseFailure = prices_err_result.value
         return self._handle_failure(failure)
 
     @staticmethod
@@ -61,7 +61,7 @@ class PriceProvisioningController:
 
     @staticmethod
     def _handle_failure(
-        _: LoadFromCsvUseCaseFailure
+        _: LoadPricesUseCaseFailure
     ) -> Result[ProvisionedPricesViewModel, PriceProvisioningControllerFailure]:
         return Result.error(PriceProvisioningControllerGenericFailure())
 
