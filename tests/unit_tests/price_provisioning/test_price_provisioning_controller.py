@@ -14,7 +14,7 @@ from src.features.price_provisioning.domain.use_cases.load_from_csv_use_case imp
 )
 from src.features.price_provisioning.price_provisioning_controller import (
     PriceProvisioningController,
-    PriceProvisioningControllerFailure,
+    PriceProvisioningControllerFailure, PriceViewModel, ProvisionedPricesViewModel,
 )
 
 
@@ -39,58 +39,101 @@ class TestPriceProvisioningController:
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
-        'entries',
+        'entries, expected',
         [
-            [],
-            [PriceEntry(
-                price=Price(
-                    amount_in_dollars=Amount(value=344.93),
-                    amount_in_original_currency=Amount(value=224.07),
-                    original_currency=OriginalCurrency(value='pencil'),
-                    dollar_exchange_rate=ExchangeRate(value=554.94),
-                ),
-                country_name=CountryName(value='critic'),
-                date=datetime.date(year=2022, month=11, day=3),
-            )],
-            [
-                PriceEntry(
-                    price=Price(
-                        amount_in_dollars=Amount(value=344.93),
-                        amount_in_original_currency=Amount(value=224.07),
-                        original_currency=OriginalCurrency(value='pencil'),
-                        dollar_exchange_rate=ExchangeRate(value=554.94),
-                    ),
-                    country_name=CountryName(value='critic'),
-                    date=datetime.date(year=2022, month=11, day=3),
-                ),
-                PriceEntry(
-                    price=Price(
-                        amount_in_dollars=Amount(value=457.05),
-                        amount_in_original_currency=Amount(value=340.49),
-                        original_currency=OriginalCurrency(value='consider'),
-                        dollar_exchange_rate=ExchangeRate(value=618.24),
-                    ),
-                    country_name=CountryName(value='fact'),
-                    date=datetime.date(year=2022, month=11, day=4),
+            ([], ProvisionedPricesViewModel(prices=[])),
+            (
+                [
+                    PriceEntry(
+                        price=Price(
+                            amount_in_dollars=Amount(value=344.93),
+                            amount_in_original_currency=Amount(value=224.07),
+                            original_currency=OriginalCurrency(value='pencil'),
+                            dollar_exchange_rate=ExchangeRate(value=554.94),
+                        ),
+                        country_name=CountryName(value='critic'),
+                        date=datetime.date(year=2022, month=11, day=3),
+                    )
+                ],
+                ProvisionedPricesViewModel(
+                    prices=[
+                        PriceViewModel(
+                            country_name='critic',
+                            dollar_exchange_rate=554.94,
+                            price_in_dollars=344.93,
+                            date=datetime.date(year=2022, month=11, day=3),
+                            price_in_local_currency=224.07,
+                            local_currency_code='pencil',
+                        )
+                    ]
                 )
-            ]
+            ),
+            (
+                [
+                    PriceEntry(
+                        price=Price(
+                            amount_in_dollars=Amount(value=344.93),
+                            amount_in_original_currency=Amount(value=224.07),
+                            original_currency=OriginalCurrency(value='pencil'),
+                            dollar_exchange_rate=ExchangeRate(value=554.94),
+                        ),
+                        country_name=CountryName(value='critic'),
+                        date=datetime.date(year=2022, month=11, day=3),
+                    ),
+                    PriceEntry(
+                        price=Price(
+                            amount_in_dollars=Amount(value=457.05),
+                            amount_in_original_currency=Amount(value=340.49),
+                            original_currency=OriginalCurrency(value='consider'),
+                            dollar_exchange_rate=ExchangeRate(value=618.24),
+                        ),
+                        country_name=CountryName(value='fact'),
+                        date=datetime.date(year=2022, month=11, day=4),
+                    )
+                ],
+                ProvisionedPricesViewModel(
+                    prices=[
+                        PriceViewModel(
+                            country_name='critic',
+                            dollar_exchange_rate=554.94,
+                            price_in_dollars=344.93,
+                            date=datetime.date(year=2022, month=11, day=3),
+                            price_in_local_currency=224.07,
+                            local_currency_code='pencil',
+                        ),
+                        PriceViewModel(
+                            country_name='fact',
+                            dollar_exchange_rate=618.24,
+                            price_in_dollars=457.05,
+                            date=datetime.date(year=2022, month=11, day=4),
+                            price_in_local_currency=340.49,
+                            local_currency_code='consider',
+                        ),
+                    ]
+                )
+            ),
         ]
     )
-    async def test_provision_prices_should_return_ok_result(self, entries: list[PriceEntry]) -> None:
+    async def test_provision_prices_should_return_ok_result(
+        self,
+        entries: list[PriceEntry],
+        expected: ProvisionedPricesViewModel
+    ) -> None:
         self._decoy.when(
             await self._dummy_load_from_csv_use_case.execute()
         ).then_return(Result[list[PriceEntry], LoadFromCsvUseCaseFailure].ok(entries))  # type: ignore
 
-        result: Result[list[PriceEntry], PriceProvisioningControllerFailure] = await self._controller.provision_prices()
+        result: Result[ProvisionedPricesViewModel, PriceProvisioningControllerFailure] = \
+            await self._controller.provision_prices()
 
         assert result.is_ok()
 
-        ok_result: Ok[list[PriceEntry], PriceProvisioningControllerFailure] = typing.cast(
-            Ok[list[PriceEntry], PriceProvisioningControllerFailure],
+        ok_result: Ok[ProvisionedPricesViewModel, PriceProvisioningControllerFailure] = typing.cast(
+            Ok[ProvisionedPricesViewModel, PriceProvisioningControllerFailure],
             result
         )
 
-        assert ok_result.value == entries
+        assert ok_result.value == expected
 
     @pytest.mark.asyncio
     async def test_provision_prices_should_return_generic_failure(self) -> None:
@@ -100,6 +143,7 @@ class TestPriceProvisioningController:
             await self._dummy_load_from_csv_use_case.execute()
         ).then_return(Result.error(load_failure))
 
-        result: Result[list[PriceEntry], PriceProvisioningControllerFailure] = await self._controller.provision_prices()
+        result: Result[ProvisionedPricesViewModel, PriceProvisioningControllerFailure] = \
+            await self._controller.provision_prices()
 
         assert result.is_err()
