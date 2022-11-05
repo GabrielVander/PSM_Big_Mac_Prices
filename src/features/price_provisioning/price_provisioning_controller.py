@@ -6,11 +6,8 @@ import datetime
 import typing
 
 from src.core.domain.entities.price_entry import PriceEntry
+from src.core.domain.use_cases.load_prices_use_case import LoadPricesUseCase, LoadPricesUseCaseFailure
 from src.core.utils.result import Error, Ok, Result
-from src.features.price_provisioning.domain.use_cases.load_prices_use_case import (
-    LoadPricesUseCase,
-    LoadPricesUseCaseFailure,
-)
 
 
 class PriceProvisioningControllerFailure(abc.ABC):

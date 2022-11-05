@@ -7,11 +7,8 @@ import pytest
 
 from src.core.domain.entities.price import Amount, ExchangeRate, OriginalCurrency, Price
 from src.core.domain.entities.price_entry import CountryName, PriceEntry
+from src.core.domain.use_cases.load_prices_use_case import LoadPricesUseCase, LoadPricesUseCaseFailure
 from src.core.utils.result import Ok, Result
-from src.features.price_provisioning.domain.use_cases.load_prices_use_case import (
-    LoadPricesUseCase,
-    LoadPricesUseCaseFailure,
-)
 from src.features.price_provisioning.price_provisioning_controller import (
     PriceProvisioningController,
     PriceProvisioningControllerFailure, PriceViewModel, ProvisionedPricesViewModel,
