@@ -10,11 +10,11 @@ ErrT = typing.TypeVar('ErrT')
 class Result(typing.Generic[OkT, ErrT], abc.ABC):
 
     @staticmethod
-    def ok(ok_value: OkT) -> Ok:
+    def ok(ok_value: OkT) -> Ok[OkT, ErrT]:
         return Ok[OkT, ErrT](ok_value)
 
     @staticmethod
-    def error(err_value: ErrT) -> Error:
+    def error(err_value: ErrT) -> Error[OkT, ErrT]:
         return Error[OkT, ErrT](err_value)
 
     @abc.abstractmethod

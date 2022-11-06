@@ -17,3 +17,13 @@ class PriceRepository(abc.ABC):
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class PriceRepositoryFailure(abc.ABC):
     pass
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class PriceRepositoryGenericFailure(PriceRepositoryFailure):
+    pass
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class PriceRepositoryDependenciesFailure(PriceRepositoryFailure):
+    reason: str
