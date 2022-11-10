@@ -22,7 +22,7 @@ class CsvFileReader:
             if is_not_a_file:
                 return Result.error(CsvFileReaderNotAFileFailure(details='Given file path is not a file'))
 
-            return Result.error(CsvFileReaderNotAFileFailure(details='Given file path does not exist'))
+            return Result.error(CsvFileReaderNonExistingFileFailure(details='Given file path does not exist'))
 
         pandas_data_frame: pandas.DataFrame = pandas.read_csv(path)
         output: CsvFileOutput = pandas_data_frame.to_dict(orient='index')
@@ -37,6 +37,11 @@ class CsvFileReaderFailure(abc.ABC):
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class CsvFileReaderNotAFileFailure(CsvFileReaderFailure):
+    details: str
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class CsvFileReaderNonExistingFileFailure(CsvFileReaderFailure):
     details: str
 
 

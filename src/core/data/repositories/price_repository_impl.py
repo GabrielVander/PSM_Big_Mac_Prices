@@ -1,6 +1,10 @@
 import typing
 
-from src.core.data.data_sources.csv_data_source import CsvDataSource, CsvDataSourceFailure, CsvDataSourceFileFailure
+from src.core.data.data_sources.csv_data_source import (
+    CsvDataSource,
+    CsvDataSourceDependenciesFailure,
+    CsvDataSourceFailure,
+)
 from src.core.data.data_sources.models.csv_price_model import CsvPriceModel
 from src.core.data.repositories.mappers.csv_price_mapper import CsvPriceMapper, CsvPriceMapperFailure
 from src.core.domain.entities.price_entry import PriceEntry
@@ -52,8 +56,8 @@ class PriceRepositoryImpl(PriceRepository):
     def _handle_failure(failure: CsvDataSourceFailure) -> Error[list[PriceEntry], PriceRepositoryFailure]:
         repo_failure: PriceRepositoryFailure = PriceRepositoryGenericFailure()
 
-        if isinstance(failure, CsvDataSourceFileFailure):
-            failure = typing.cast(CsvDataSourceFileFailure, failure)
+        if isinstance(failure, CsvDataSourceDependenciesFailure):
+            failure = typing.cast(CsvDataSourceDependenciesFailure, failure)
             repo_failure = PriceRepositoryDependenciesFailure(reason=failure.reason)
 
         return Result.error(repo_failure)

@@ -10,7 +10,7 @@ from src.core.data.data_sources.utils.csv_file_reader import (
     CsvFileOutput,
     CsvFileReader,
     CsvFileReaderFailure,
-    CsvFileReaderNotAFileFailure,
+    CsvFileReaderNonExistingFileFailure, CsvFileReaderNotAFileFailure,
 )
 from src.core.utils.result import Error, Ok, Result
 
@@ -67,10 +67,13 @@ class TestCsvFileReader:
         err_result: Error[CsvFileOutput, CsvFileReaderFailure] = typing.cast(Error, result)
         failure: CsvFileReaderFailure = err_result.value
 
-        assert isinstance(failure, CsvFileReaderNotAFileFailure)
-        not_a_file_failure: CsvFileReaderNotAFileFailure = typing.cast(CsvFileReaderNotAFileFailure, failure)
+        assert isinstance(failure, CsvFileReaderNonExistingFileFailure)
+        non_existing_file_failure: CsvFileReaderNonExistingFileFailure = typing.cast(
+            CsvFileReaderNonExistingFileFailure,
+            failure
+        )
 
-        assert not_a_file_failure.details == 'Given file path does not exist'
+        assert non_existing_file_failure.details == 'Given file path does not exist'
 
     @pytest.mark.asyncio
     async def test_should_use_pandas_correctly(self, monkeypatch: pytest.MonkeyPatch) -> None:

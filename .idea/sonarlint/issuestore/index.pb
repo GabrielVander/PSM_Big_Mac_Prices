@@ -23,8 +23,6 @@ Q
 !tests/unit_tests/core/__init__.py,c/9/c92e55452a4f56e1019e0ec6c299f18ec0547eb5
 ?
 src/__init__.py,b/1/b141e8a708cfc0de96ab25c59ca83087cbddf7fa
-@
-requirements.txt,1/9/19359a61ae2446b51b549167b014da2fcf265768
 [
 +src/core/presentation/utils/options_menu.py,a/2/a249754eb03118dfc5e2d7764e3c4e9f28a84776
 m

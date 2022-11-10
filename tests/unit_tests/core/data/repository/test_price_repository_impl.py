@@ -4,7 +4,11 @@ from collections.abc import Callable, Generator
 import decoy
 import pytest
 
-from src.core.data.data_sources.csv_data_source import CsvDataSource, CsvDataSourceFailure, CsvDataSourceFileFailure
+from src.core.data.data_sources.csv_data_source import (
+    CsvDataSource,
+    CsvDataSourceDependenciesFailure,
+    CsvDataSourceFailure,
+)
 from src.core.data.data_sources.models.csv_price_model import CsvPriceModel
 from src.core.data.repositories.mappers.csv_price_mapper import CsvPriceMapper, CsvPriceMapperFailure
 from src.core.data.repositories.price_repository_impl import PriceRepositoryImpl
@@ -181,12 +185,21 @@ class TestPriceRepositoryImpl:
         )
 
     @pytest.mark.asyncio
-    async def test_fetch_should_return_dependencies_failure_if_data_source_returns_file_failure(self) -> None:
-        failure_reason: str = 'Csv file not found'
-
+    @pytest.mark.parametrize(
+        'csv_data_source_failure, expected_reason',
+        [
+            (CsvDataSourceDependenciesFailure(reason=''), ''),
+            (CsvDataSourceDependenciesFailure(reason='T7KHF'), 'T7KHF'),
+        ]
+    )
+    async def test_fetch_should_return_dependencies_failure(
+        self,
+        csv_data_source_failure: CsvDataSourceFailure,
+        expected_reason: str
+    ) -> None:
         self._decoy.when(
             await self._dummy_csv_data_source.load()
-        ).then_return(Result.error(CsvDataSourceFileFailure(reason=failure_reason)))
+        ).then_return(Result.error(csv_data_source_failure))
 
         result: Result[list[PriceEntry], PriceRepositoryFailure] = await self._repository.fetch()
 
@@ -194,4 +207,4 @@ class TestPriceRepositoryImpl:
         err_result: Error[list[PriceEntry], PriceRepositoryFailure] = typing.cast(Error, result)
         failure: PriceRepositoryFailure = err_result.value
 
-        assert failure == PriceRepositoryDependenciesFailure(reason=failure_reason)
+        assert failure == PriceRepositoryDependenciesFailure(reason=expected_reason)
