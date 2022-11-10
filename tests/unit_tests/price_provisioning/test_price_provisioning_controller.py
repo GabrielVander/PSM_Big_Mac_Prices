@@ -56,10 +56,10 @@ class TestPriceProvisioningController:
                     prices=[
                         PriceViewModel(
                             country_name='critic',
-                            dollar_exchange_rate=554.94,
-                            price_in_dollars=344.93,
-                            date=datetime.date(year=2022, month=11, day=3),
-                            price_in_local_currency=224.07,
+                            dollar_exchange_rate='554.94',
+                            price_in_dollars='344.93',
+                            date='2022.11.03',
+                            price_in_local_currency='224.07',
                             local_currency_code='pencil',
                         )
                     ]
@@ -92,18 +92,18 @@ class TestPriceProvisioningController:
                     prices=[
                         PriceViewModel(
                             country_name='critic',
-                            dollar_exchange_rate=554.94,
-                            price_in_dollars=344.93,
-                            date=datetime.date(year=2022, month=11, day=3),
-                            price_in_local_currency=224.07,
+                            dollar_exchange_rate='554.94',
+                            price_in_dollars='344.93',
+                            date='2022.11.03',
+                            price_in_local_currency='224.07',
                             local_currency_code='pencil',
                         ),
                         PriceViewModel(
                             country_name='fact',
-                            dollar_exchange_rate=618.24,
-                            price_in_dollars=457.05,
-                            date=datetime.date(year=2022, month=11, day=4),
-                            price_in_local_currency=340.49,
+                            dollar_exchange_rate='618.24',
+                            price_in_dollars='457.05',
+                            date='2022.11.04',
+                            price_in_local_currency='340.49',
                             local_currency_code='consider',
                         ),
                     ]

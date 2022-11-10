@@ -40,17 +40,16 @@ class PriceProvisioningController:
         failure: LoadPricesUseCaseFailure = prices_err_result.value
         return self._handle_failure(failure)
 
-    @staticmethod
-    def _to_view_model(prices: list[PriceEntry]) -> ProvisionedPricesViewModel:
+    def _to_view_model(self, prices: list[PriceEntry]) -> ProvisionedPricesViewModel:
         return ProvisionedPricesViewModel(
             prices=[
                 PriceViewModel(
-                    price_in_dollars=p.price.amount_in_dollars.value,
-                    price_in_local_currency=p.price.amount_in_original_currency.value,
+                    price_in_dollars=self._float_as_str(p.price.amount_in_dollars.value),
+                    price_in_local_currency=self._float_as_str(p.price.amount_in_original_currency.value),
                     local_currency_code=p.price.original_currency.value,
                     country_name=p.country_name.value,
-                    dollar_exchange_rate=p.price.dollar_exchange_rate.value,
-                    date=p.date,
+                    dollar_exchange_rate=self._float_as_str(p.price.dollar_exchange_rate.value),
+                    date=self._date_as_str(p.date),
                 )
                 for p in prices
             ]
@@ -61,6 +60,14 @@ class PriceProvisioningController:
         _: LoadPricesUseCaseFailure
     ) -> Result[ProvisionedPricesViewModel, PriceProvisioningControllerFailure]:
         return Result.error(PriceProvisioningControllerGenericFailure())
+
+    @staticmethod
+    def _float_as_str(value: float) -> str:
+        return str(value)
+
+    @staticmethod
+    def _date_as_str(date: datetime.date) -> str:
+        return date.strftime('%Y.%m.%d')
 
 
 class PriceProvisioningControllerGenericFailure(PriceProvisioningControllerFailure):
@@ -76,7 +83,7 @@ class ProvisionedPricesViewModel:
 class PriceViewModel:
     country_name: str
     local_currency_code: str
-    price_in_local_currency: float
-    price_in_dollars: float
-    dollar_exchange_rate: float
-    date: datetime.date
+    price_in_local_currency: str
+    price_in_dollars: str
+    dollar_exchange_rate: str
+    date: str
