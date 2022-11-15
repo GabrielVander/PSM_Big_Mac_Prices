@@ -5,11 +5,8 @@ import typing
 from src.core.domain.entities.price import Amount
 from src.core.domain.entities.price_entry import CountryName, PriceEntry
 from src.core.utils.result import Result
+from src.features.statistics.domain.entities.average_price_entry import AveragePrice, AveragePriceEntry
 from src.features.statistics.domain.entities.statistics_failure import StatisticsFailure
-from src.features.statistics.presentation.average_price_per_country_view_model import (
-    AveragePrice,
-    AveragePriceEntry, AveragePricePerCountryViewModel,
-)
 
 PriceSumPerCountry: typing.TypeAlias = dict[CountryName, tuple[Amount, int]]
 
@@ -19,11 +16,10 @@ class CalculateAveragePricePerCountryUseCase:
     def execute(
         self,
         entries: list[PriceEntry]
-    ) -> Result[AveragePricePerCountryViewModel, StatisticsFailure]:
+    ) -> Result[list[AveragePriceEntry], StatisticsFailure]:
         average_prices: list[AveragePriceEntry] = self._get_average_prices(entries)
-        view_model: AveragePricePerCountryViewModel = AveragePricePerCountryViewModel(values=average_prices)
 
-        return Result[AveragePricePerCountryViewModel, StatisticsFailure].ok(view_model)  # type: ignore
+        return Result[list[AveragePriceEntry], StatisticsFailure].ok(average_prices)  # type: ignore
 
     def _get_average_prices(self, entries: list[PriceEntry]) -> list[AveragePriceEntry]:
         sum_per_country: PriceSumPerCountry = self._get_price_sum_per_country(entries)
