@@ -78,7 +78,7 @@ class _Header:
 
     def __init__(self, width: int) -> None:
         self._lines = [
-            'Big Mac Prices'.center(width, '-')
+            ' Big Mac Prices '.center(width, '-')
         ]
 
     def display(self) -> None:

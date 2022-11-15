@@ -38,7 +38,7 @@ class TestMainMenu:
     async def test_should_display_correct_message(self, monkeypatch: MonkeyPatch) -> None:
         menu_width: int = 100
         expected_lines: list[str] = [
-            'Big Mac Prices'.center(menu_width, '-'),
+            ' Big Mac Prices '.center(menu_width, '-'),
             '1 - Display raw data\n',
         ]
         expected_text: str = '\n'.join(expected_lines)

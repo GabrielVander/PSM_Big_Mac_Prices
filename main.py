@@ -1,6 +1,11 @@
-def run():
-    print('Hello World')
+import asyncio
+
+from src.big_mac_application import BigMacApplication
+
+
+async def run():
+    await BigMacApplication.run()
 
 
 if __name__ == '__main__':
-    run()
+    asyncio.run(run())

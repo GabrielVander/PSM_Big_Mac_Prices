@@ -38,6 +38,7 @@ class PriceProvisioningController:
         )
 
         failure: LoadPricesUseCaseFailure = prices_err_result.value
+
         return self._handle_failure(failure)
 
     def _to_view_model(self, prices: list[PriceEntry]) -> ProvisionedPricesViewModel:
