@@ -55,12 +55,12 @@ class TestCsvDataSource:
             ({}, []),
             ({
                  0: {
-                     'date':          '2000-04-01',
-                     'currency_code': 'ARS',
-                     'name':          'Argentina',
-                     'local_price':   '2.5',
-                     'dollar_ex':     '1',
-                     'dollar_price':  '2.5',
+                     'date      ':         '2000-04-01',
+                     'currency_code':      'ARS',
+                     'name              ': 'Argentina',
+                     'local_price':        '2.5',
+                     'dollar_ex':          '1',
+                     'dollar_price':       '2.5',
                  }
              }, [
                  CsvPriceModel(
@@ -74,28 +74,28 @@ class TestCsvDataSource:
              ]),
             ({
                  0: {
-                     'date':          '2000-04-01',
-                     'currency_code': 'ARS',
-                     'name':          'Argentina',
-                     'local_price':   '2.5',
-                     'dollar_ex':     '1',
-                     'dollar_price':  '2.5',
+                     'date      ':         '2000-04-01',
+                     'currency_code':      'ARS',
+                     'name              ': 'Argentina',
+                     'local_price':        '2.5',
+                     'dollar_ex':          '1',
+                     'dollar_price':       '2.5',
                  },
                  1: {
-                     'date':          'GBg',
-                     'currency_code': '072wj3S',
-                     'name':          'Ly09',
-                     'local_price':   '447.00',
-                     'dollar_ex':     '895.12',
-                     'dollar_price':  '406.19',
+                     'date      ':         'GBg',
+                     'currency_code':      '072wj3S',
+                     'name              ': 'Ly09',
+                     'local_price':        '447.00',
+                     'dollar_ex':          '895.12',
+                     'dollar_price':       '406.19',
                  },
                  2: {
-                     'date':          'lEfU',
-                     'currency_code': 'feY',
-                     'name':          'MZ6269aS',
-                     'local_price':   '666.78',
-                     'dollar_ex':     '838.51',
-                     'dollar_price':  '760.49',
+                     'date      ':         'lEfU',
+                     'currency_code':      'feY',
+                     'name              ': 'MZ6269aS',
+                     'local_price':        '666.78',
+                     'dollar_ex':          '838.51',
+                     'dollar_price':       '760.49',
                  }
              }, [
                  CsvPriceModel(

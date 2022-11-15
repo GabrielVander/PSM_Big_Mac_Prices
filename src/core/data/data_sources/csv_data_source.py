@@ -64,13 +64,20 @@ class CsvDataSource:
 
     @staticmethod
     def _to_model(raw_price: dict[str, str | int | float]) -> CsvPriceModel:
+        date_key: str = 'date      '
+        currency_code_key: str = 'currency_code'
+        name_key: str = 'name              '
+        local_price: str = 'local_price'
+        dollar_exchange_key: str = 'dollar_ex'
+        dollar_price_key: str = 'dollar_price'
+
         return CsvPriceModel(
-            date=typing.cast(str, raw_price['date']),
-            currency_code=typing.cast(str, raw_price['currency_code']),
-            name=typing.cast(str, raw_price['name']),
-            local_price=float(raw_price['local_price']),
-            dollar_ex=float(raw_price['dollar_ex']),
-            dollar_price=float(raw_price['dollar_price']),
+            date=typing.cast(str, raw_price[date_key]),
+            currency_code=typing.cast(str, raw_price[currency_code_key]),
+            name=typing.cast(str, raw_price[name_key]),
+            local_price=float(raw_price[local_price]),
+            dollar_ex=float(raw_price[dollar_exchange_key]),
+            dollar_price=float(raw_price[dollar_price_key]),
         )
 
 
