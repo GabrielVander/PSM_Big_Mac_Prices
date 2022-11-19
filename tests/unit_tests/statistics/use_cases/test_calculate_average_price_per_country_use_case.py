@@ -8,9 +8,8 @@ from src.core.domain.entities.price import Amount, ExchangeRate, OriginalCurrenc
 from src.core.domain.entities.price_entry import CountryName, PriceEntry
 from src.core.utils.result import Ok, Result
 from src.features.statistics.domain.entities.average_price_entry import AveragePrice, AveragePriceEntry
-from src.features.statistics.domain.entities.statistics_failure import StatisticsFailure
 from src.features.statistics.domain.use_cases.calculate_average_price_per_country_use_case import (
-    CalculateAveragePricePerCountryUseCase,
+    CalculateAveragePricePerCountryUseCase, CalculateAveragePriceUseCaseFailure,
 )
 
 
@@ -297,7 +296,7 @@ class TestCalculateAveragePricePerCountryUseCase:
                 [
                     AveragePriceEntry(
                         country=CountryName(value='affair'),
-                        price=AveragePrice(value=469.7966666666667),
+                        price=AveragePrice(value=469.8),
                     ),
                 ]
             ),
@@ -347,7 +346,7 @@ class TestCalculateAveragePricePerCountryUseCase:
                 [
                     AveragePriceEntry(
                         country=CountryName(value='affair'),
-                        price=AveragePrice(value=685.075),
+                        price=AveragePrice(value=685.08),
                     ),
                     AveragePriceEntry(
                         country=CountryName(value='height'),
@@ -363,10 +362,10 @@ class TestCalculateAveragePricePerCountryUseCase:
         entries: list[PriceEntry],
         expected_results: list[AveragePriceEntry]
     ) -> None:
-        result: Result[list[AveragePriceEntry], StatisticsFailure] = self._use_case.execute(entries)
+        result: Result[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure] = self._use_case.execute(entries)
 
         assert result.is_ok()
 
-        ok_result: Ok[list[AveragePriceEntry], StatisticsFailure] = typing.cast(Ok, result)
+        ok_result: Ok[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure] = typing.cast(Ok, result)
 
         assert ok_result.value == expected_results

@@ -5,21 +5,34 @@ import dataclasses
 import typing
 from collections.abc import Awaitable, Callable, Generator
 
-from src.core.utils.result import Ok, Result
+from src.core.utils.result import Error, Ok, Result
 from src.features.price_provisioning.price_provisioning_controller import (
     PriceProvisioningController,
     PriceProvisioningControllerFailure, ProvisionedPricesViewModel,
 )
+from src.features.statistics.presentation.average_price_per_country_view_model import AveragePricePerCountryViewModel
+from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
 
 class MainMenu:
     _options: list[_Option]
     _price_provisioning_controller: PriceProvisioningController
+    _statistics_controller: StatisticsController
 
-    def __init__(self, price_provisioning_controller: PriceProvisioningController) -> None:
+    def __init__(
+        self,
+        price_provisioning_controller: PriceProvisioningController,
+        statistics_controller: StatisticsController,
+    ) -> None:
         self._price_provisioning_controller = price_provisioning_controller
+        self._statistics_controller = statistics_controller
         self._options = [
             _AsyncOption(id=1, display_message='Display raw data', on_select=self._display_raw_data),
+            _AsyncOption(
+                id=2,
+                display_message='Calculate average price per country',
+                on_select=self._calculate_average_prices,
+            ),
         ]
 
     async def run(self) -> None:
@@ -64,6 +77,27 @@ class MainMenu:
 
             self._display_prices(raw_prices_ok_result.value)
 
+    async def _calculate_average_prices(self) -> None:
+        average_prices_result: Result[AveragePricePerCountryViewModel, StatisticsControllerFailure] = await \
+            self._statistics_controller.calculate_average_price()
+
+        if average_prices_result.is_err():
+            return self._handle_failure(average_prices_result)
+
+        average_prices_ok_result: Ok[AveragePricePerCountryViewModel, StatisticsControllerFailure] = typing.cast(
+            Ok,
+            average_prices_result
+        )
+        average_price_view_model: AveragePricePerCountryViewModel = average_prices_ok_result.value
+
+        self._display_average_prices(average_price_view_model)
+
+    @staticmethod
+    def _handle_failure(result: Result[typing.Any, typing.Any]) -> None:
+        err_result: Error = typing.cast(Error, result)
+
+        print(str(err_result.value))
+
     @staticmethod
     def _display_header() -> None:
         _Header(100).display()
@@ -71,6 +105,10 @@ class MainMenu:
     @staticmethod
     def _display_prices(view_model: ProvisionedPricesViewModel) -> None:
         _RawDataDisplayer(view_model=view_model).run()
+
+    @staticmethod
+    def _display_average_prices(average_price_view_model: AveragePricePerCountryViewModel) -> None:
+        _AveragePriceDisplayer(view_model=average_price_view_model).run()
 
 
 class _Header:
@@ -121,9 +159,28 @@ class _RawDataDisplayer:
             yield separator
             yield f'Entry #{i + 1}:'
             yield f'Country Name: {price.country_name}'
-            yield f'Prince in USD: {price.price_in_dollars}'
+            yield f'Price in USD: {price.price_in_dollars}'
             yield f'Local Currency: {price.local_currency_code}'
             yield f'Price in local currency: {price.price_in_local_currency}'
             yield f'USD exchange rate: {price.dollar_exchange_rate}'
             yield f'Date: {price.date}'
-            yield separator
+
+
+class _AveragePriceDisplayer:
+    _view_model: AveragePricePerCountryViewModel
+
+    def __init__(self, view_model: AveragePricePerCountryViewModel) -> None:
+        self._view_model = view_model
+
+    def run(self) -> None:
+        lines: list[str] = list(self._generate_lines())
+
+        print('\n'.join(lines))
+
+    def _generate_lines(self) -> Generator[str, None, None]:
+        divisor: str = '-' * 15
+
+        for price in self._view_model.values:
+            yield divisor
+            yield f'Country: {price.country_name}'
+            yield f'Average price in USD: {price.price}'

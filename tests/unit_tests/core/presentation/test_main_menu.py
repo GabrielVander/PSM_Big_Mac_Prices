@@ -13,11 +13,17 @@ from src.features.price_provisioning.price_provisioning_controller import (
     PriceProvisioningController,
     PriceViewModel, ProvisionedPricesViewModel,
 )
+from src.features.statistics.presentation.average_price_per_country_view_model import (
+    AveragePricePerCountryViewModel,
+    AveragePriceViewModel,
+)
+from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
 
 class TestMainMenu:
     _decoy: decoy.Decoy
     _dummy_price_provisioning_controller: PriceProvisioningController
+    _dummy_statistics_controller: StatisticsController
     _menu: MainMenu
 
     @pytest.fixture(autouse=True)
@@ -25,8 +31,10 @@ class TestMainMenu:
         # Set Up
         self._decoy = decoy.Decoy()
         self._dummy_price_provisioning_controller = self._decoy.mock(cls=PriceProvisioningController)
+        self._dummy_statistics_controller = self._decoy.mock(cls=StatisticsController)
         self._menu = MainMenu(
             price_provisioning_controller=self._dummy_price_provisioning_controller,
+            statistics_controller=self._dummy_statistics_controller,
         )
 
         yield
@@ -39,7 +47,8 @@ class TestMainMenu:
         menu_width: int = 100
         expected_lines: list[str] = [
             ' Big Mac Prices '.center(menu_width, '-'),
-            '1 - Display raw data\n',
+            '1 - Display raw data',
+            '2 - Calculate average price per country\n',
         ]
         expected_text: str = '\n'.join(expected_lines)
         dummy_input: Callable[[str], str] = self._decoy.mock(func=Callable[[str], str])  # type: ignore
@@ -74,16 +83,15 @@ class TestMainMenu:
                     ),
                 ]
             ), [
-                 '-' * 15,
-                 'Entry #1:',
-                 'Country Name: ',
-                 'Prince in USD: ',
-                 'Local Currency: ',
-                 'Price in local currency: ',
-                 'USD exchange rate: ',
-                 'Date: ',
-                 '-' * 15,
-             ]),
+                '-' * 15,
+                'Entry #1:',
+                'Country Name: ',
+                'Price in USD: ',
+                'Local Currency: ',
+                'Price in local currency: ',
+                'USD exchange rate: ',
+                'Date: ',
+            ]),
             (ProvisionedPricesViewModel(
                 prices=[
                     PriceViewModel(
@@ -96,16 +104,15 @@ class TestMainMenu:
                     ),
                 ]
             ), [
-                 '-' * 15,
-                 'Entry #1:',
-                 'Country Name: 5N2u86',
-                 'Prince in USD: u4H',
-                 'Local Currency: u1xc',
-                 'Price in local currency: 8M6fM8',
-                 'USD exchange rate: 2J9w',
-                 'Date: S6Tzngi',
-                 '-' * 15,
-             ]),
+                '-' * 15,
+                'Entry #1:',
+                'Country Name: 5N2u86',
+                'Price in USD: u4H',
+                'Local Currency: u1xc',
+                'Price in local currency: 8M6fM8',
+                'USD exchange rate: 2J9w',
+                'Date: S6Tzngi',
+            ]),
             (ProvisionedPricesViewModel(
                 prices=[
                     PriceViewModel(
@@ -126,25 +133,23 @@ class TestMainMenu:
                     ),
                 ]
             ), [
-                 '-' * 15,
-                 'Entry #1:',
-                 'Country Name: 5N2u86',
-                 'Prince in USD: u4H',
-                 'Local Currency: u1xc',
-                 'Price in local currency: 8M6fM8',
-                 'USD exchange rate: 2J9w',
-                 'Date: S6Tzngi',
-                 '-' * 15,
-                 '-' * 15,
-                 'Entry #2:',
-                 'Country Name: BPr',
-                 'Prince in USD: K4ZSJ0Q',
-                 'Local Currency: 0p88',
-                 'Price in local currency: hL1Wa',
-                 'USD exchange rate: W9Uw5Ul',
-                 'Date: SKj43n7b',
-                 '-' * 15,
-             ])
+                '-' * 15,
+                'Entry #1:',
+                'Country Name: 5N2u86',
+                'Price in USD: u4H',
+                'Local Currency: u1xc',
+                'Price in local currency: 8M6fM8',
+                'USD exchange rate: 2J9w',
+                'Date: S6Tzngi',
+                '-' * 15,
+                'Entry #2:',
+                'Country Name: BPr',
+                'Price in USD: K4ZSJ0Q',
+                'Local Currency: 0p88',
+                'Price in local currency: hL1Wa',
+                'USD exchange rate: W9Uw5Ul',
+                'Date: SKj43n7b',
+            ])
         ]
     )
     async def test_raw_data_option_should_trigger_and_display_correctly(
@@ -164,6 +169,83 @@ class TestMainMenu:
         self._decoy.when(
             dummy_input('\nChoose an option...\n')
         ).then_return('1')
+
+        monkeypatch.setattr(builtins, 'input', dummy_input)
+        monkeypatch.setattr(sys, 'stdout', mock_stdout)
+
+        await self._menu.run()
+
+        assert expected_text in mock_stdout.getvalue()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        'view_model, expected_lines',
+        [
+            (AveragePricePerCountryViewModel(values=[]), []),
+            (AveragePricePerCountryViewModel(
+                values=[
+                    AveragePriceViewModel(
+                        country_name='',
+                        price='0.0'
+                    ),
+                ]
+            ), [
+                 '-' * 15,
+                 'Country: ',
+                 'Average price in USD: ',
+             ]),
+        ]
+    )
+    async def test_average_prices_option_should_trigger_and_display_correctly(
+        self,
+        view_model: AveragePricePerCountryViewModel,
+        expected_lines: list[str],
+        monkeypatch: MonkeyPatch,
+    ) -> None:
+        expected_text: str = '\n'.join(expected_lines)
+        dummy_input: Callable[[str], str] = self._decoy.mock(func=Callable[[str], str])  # type: ignore
+        mock_stdout: io.StringIO = io.StringIO()
+
+        self._decoy.when(
+            await self._dummy_statistics_controller.calculate_average_price()
+        ).then_return(Result.ok(view_model))
+
+        self._decoy.when(
+            dummy_input('\nChoose an option...\n')
+        ).then_return('2')
+
+        monkeypatch.setattr(builtins, 'input', dummy_input)
+        monkeypatch.setattr(sys, 'stdout', mock_stdout)
+
+        await self._menu.run()
+
+        assert expected_text in mock_stdout.getvalue()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        'failure, expected_lines',
+        [
+            (StatisticsControllerFailure(message=''), ["StatisticsControllerFailure(message='')"]),
+            (StatisticsControllerFailure(message='hBMe'), ["StatisticsControllerFailure(message='hBMe')"]),
+        ]
+    )
+    async def test_average_prices_option_should_display_failure(
+        self,
+        failure: StatisticsControllerFailure,
+        expected_lines: list[str],
+        monkeypatch: MonkeyPatch,
+    ) -> None:
+        expected_text: str = '\n'.join(expected_lines)
+        dummy_input: Callable[[str], str] = self._decoy.mock(func=Callable[[str], str])  # type: ignore
+        mock_stdout: io.StringIO = io.StringIO()
+
+        self._decoy.when(
+            await self._dummy_statistics_controller.calculate_average_price()
+        ).then_return(Result.error(failure))
+
+        self._decoy.when(
+            dummy_input('\nChoose an option...\n')
+        ).then_return('2')
 
         monkeypatch.setattr(builtins, 'input', dummy_input)
         monkeypatch.setattr(sys, 'stdout', mock_stdout)

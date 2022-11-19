@@ -36,7 +36,7 @@ class CalculateAveragePricePerCountryUseCase:
             country_name, info = i
             price_sum, count = info
 
-            averages.append((country_name, AveragePrice(value=price_sum.value / count)))
+            averages.append((country_name, AveragePrice(value=round(price_sum.value / count, 2))))
 
         return averages
 
