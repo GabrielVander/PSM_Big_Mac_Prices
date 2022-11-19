@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import typing
 
 from src.core.domain.entities.price import Amount
@@ -16,7 +17,7 @@ class CalculateAveragePricePerCountryUseCase:
     def execute(
         self,
         entries: list[PriceEntry]
-    ) -> Result[list[AveragePriceEntry], StatisticsFailure]:
+    ) -> Result[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure]:
         average_prices: list[AveragePriceEntry] = self._get_average_prices(entries)
 
         return Result[list[AveragePriceEntry], StatisticsFailure].ok(average_prices)  # type: ignore
@@ -58,3 +59,8 @@ class CalculateAveragePricePerCountryUseCase:
             price_sum_per_country[country_name] = (new_amount, new_count)
 
         return price_sum_per_country
+
+
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class CalculateAveragePriceUseCaseFailure:
+    details: str
