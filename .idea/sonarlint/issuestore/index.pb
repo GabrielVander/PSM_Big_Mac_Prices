@@ -127,14 +127,8 @@ w
 G.idea/sonarlint/issuestore/0/b/0ba0e1e689515aca1487e185c01d2af9abb91f6e,e/8/e8dec38922e254a083635e8ffd11d5a8c0dab92f
 w
 G.idea/sonarlint/issuestore/f/5/f5a2f7dad681bc00cbd5f40671b1f2f8af32a210,1/a/1ad753c1c19e161f674ab2413a0560fa9be08003
-i
-9tests/unit_tests/statistics/test_statistics_controller.py,9/9/997e3e6e738c451130288d3326dd3c32065c5c2d
-|
-Lsrc/features/statistics/presentation/average_price_per_country_view_model.py,1/3/134bc609327f83d07ceae12ab42209676077aa04
 7
 main.py,f/1/f1bdda93d9a278e358509d498e17d97764c1fb29
-`
-0src/features/statistics/statistics_controller.py,1/7/178489832eba85116741fd45c82915b772bb1d5b
 n
 >src/features/statistics/domain/entities/average_price_entry.py,a/d/ad77aba98f3b7290294e6cf229dc3431ba6210e2
 Š

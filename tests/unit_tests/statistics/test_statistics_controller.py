@@ -20,8 +20,8 @@ from src.features.statistics.domain.use_cases.calculate_average_price_per_countr
 )
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
-    AveragePriceViewModel,
 )
+from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
 
@@ -157,7 +157,7 @@ class TestStatisticsController:
                 ],
                 AveragePricePerCountryViewModel(
                     values=[
-                        AveragePriceViewModel(
+                        SingleCountryPriceViewModel(
                             country_name='',
                             price='0.0',
                         )

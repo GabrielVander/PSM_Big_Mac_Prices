@@ -15,8 +15,8 @@ from src.features.price_provisioning.price_provisioning_controller import (
 )
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
-    AveragePriceViewModel,
 )
+from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
 
@@ -188,7 +188,7 @@ class TestMainMenu:
             (AveragePricePerCountryViewModel(values=[]), []),
             (AveragePricePerCountryViewModel(
                 values=[
-                    AveragePriceViewModel(
+                    SingleCountryPriceViewModel(
                         country_name='',
                         price='0.0'
                     ),

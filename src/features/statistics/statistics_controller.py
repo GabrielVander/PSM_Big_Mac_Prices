@@ -17,8 +17,8 @@ from src.features.statistics.domain.use_cases.calculate_average_price_per_countr
 )
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
-    AveragePriceViewModel,
 )
+from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 
 
 class StatisticsController:
@@ -53,7 +53,7 @@ class StatisticsController:
             average_result
         )
         average_prices: list[AveragePriceEntry] = average_ok_result.value
-        average_price_view_models: list[AveragePriceViewModel] = list(self._as_view_models(average_prices))
+        average_price_view_models: list[SingleCountryPriceViewModel] = list(self._as_view_models(average_prices))
 
         return Result.ok(AveragePricePerCountryViewModel(values=average_price_view_models))
 
@@ -87,9 +87,9 @@ class StatisticsController:
     @staticmethod
     def _as_view_models(
         average_prices: list[AveragePriceEntry]
-    ) -> Generator[AveragePriceViewModel, None, None]:
+    ) -> Generator[SingleCountryPriceViewModel, None, None]:
         for price in average_prices:
-            yield AveragePriceViewModel(
+            yield SingleCountryPriceViewModel(
                 country_name=price.country.value,
                 price=str(price.price.value)
             )
