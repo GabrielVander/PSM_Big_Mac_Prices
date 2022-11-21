@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import dataclasses
+import sys
 import typing
 from collections.abc import Awaitable, Callable, Generator
 
@@ -30,8 +31,8 @@ class MainMenu:
             _AsyncOption(id=1, display_message='Display raw data', on_select=self._display_raw_data),
             _SyncOption(
                 id=0,
-                display_message='Exit (WIP)',
-                on_select=lambda: None,
+                display_message='Exit',
+                on_select=lambda: sys.exit(),
             ),
             _AsyncOption(
                 id=2,
@@ -83,8 +84,9 @@ class MainMenu:
 
         if selected_option := filtered_options[0]:
             if isinstance(selected_option, _AsyncOption):
-                async_option: _AsyncOption = typing.cast(_AsyncOption, selected_option)
-                await async_option.on_select()
+                return await self._execute_async_option(selected_option)
+
+            self._execute_sync_option(selected_option)
 
     async def _display_raw_data(self) -> None:
         raw_prices_result: Result[ProvisionedPricesViewModel, PriceProvisioningControllerFailure] = \
@@ -111,6 +113,16 @@ class MainMenu:
         average_price_view_model: AveragePricePerCountryViewModel = average_prices_ok_result.value
 
         self._display_average_prices(average_price_view_model)
+
+    @staticmethod
+    async def _execute_async_option(option: _Option) -> None:
+        async_option: _AsyncOption = typing.cast(_AsyncOption, option)
+        await async_option.on_select()
+
+    @staticmethod
+    def _execute_sync_option(option: _Option) -> None:
+        sync_option: _SyncOption = typing.cast(_SyncOption, option)
+        sync_option.on_select()
 
     @staticmethod
     def _handle_failure(result: Result[typing.Any, typing.Any]) -> None:
