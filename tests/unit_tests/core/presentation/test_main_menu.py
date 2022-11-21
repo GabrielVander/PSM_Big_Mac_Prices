@@ -47,8 +47,12 @@ class TestMainMenu:
         menu_width: int = 100
         expected_lines: list[str] = [
             ' Big Mac Prices '.center(menu_width, '-'),
+            '0 - Exit (WIP)',
             '1 - Display raw data',
-            '2 - Calculate average price per country\n',
+            '2 - Calculate average price per country',
+            '3 - Get most expensive country on average (WIP)',
+            '4 - Get cheapest country on average (WIP)',
+            '5 - Calculate price change per country (WIP)\n',
         ]
         expected_text: str = '\n'.join(expected_lines)
         dummy_input: Callable[[str], str] = self._decoy.mock(func=Callable[[str], str])  # type: ignore

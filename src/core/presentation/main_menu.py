@@ -28,10 +28,30 @@ class MainMenu:
         self._statistics_controller = statistics_controller
         self._options = [
             _AsyncOption(id=1, display_message='Display raw data', on_select=self._display_raw_data),
+            _SyncOption(
+                id=0,
+                display_message='Exit (WIP)',
+                on_select=lambda: None,
+            ),
             _AsyncOption(
                 id=2,
                 display_message='Calculate average price per country',
                 on_select=self._calculate_average_prices,
+            ),
+            _SyncOption(
+                id=3,
+                display_message='Get most expensive country on average (WIP)',
+                on_select=lambda: None,
+            ),
+            _SyncOption(
+                id=4,
+                display_message='Get cheapest country on average (WIP)',
+                on_select=lambda: None,
+            ),
+            _SyncOption(
+                id=5,
+                display_message='Calculate price change per country (WIP)',
+                on_select=lambda: None,
             ),
         ]
 

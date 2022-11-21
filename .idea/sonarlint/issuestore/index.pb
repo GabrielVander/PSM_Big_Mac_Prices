@@ -137,3 +137,9 @@ Lsrc/features/statistics/presentation/average_price_per_country_view_model.py,1
 0src/features/statistics/statistics_controller.py,1/7/178489832eba85116741fd45c82915b772bb1d5b
 n
 >src/features/statistics/domain/entities/average_price_entry.py,a/d/ad77aba98f3b7290294e6cf229dc3431ba6210e2
+Š
+Ztests/unit_tests/statistics/use_cases/test_calculate_average_price_per_country_use_case.py,c/b/cbdecead19500540c7e491c8df6e3f2b9cc3a32c
+ˆ
+Xsrc/features/statistics/domain/use_cases/calculate_average_price_per_country_use_case.py,a/3/a36b573ba16dd79a9cc9beace325556f81a8b8d1
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
