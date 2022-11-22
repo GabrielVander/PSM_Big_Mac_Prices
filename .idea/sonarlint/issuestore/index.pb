@@ -41,8 +41,6 @@ T
 $src/core/domain/entities/__init__.py,a/9/a90383bff2837aea9c51ed788f20e00fd5569f15
 K
 src/core/domain/__init__.py,0/4/04f99ffaf196e405ba8c56e0ddea8d7fa3cb1862
-W
-'src/core/domain/entities/price_entry.py,d/6/d6c255ea17bfe8d908e1555dee4d28275b73ce08
 c
 3src/features/statistics/domain/entities/__init__.py,b/c/bc872d9466b0f9f3192fe0d704329e5f83452097
 m
@@ -137,3 +135,7 @@ Ztests/unit_tests/statistics/use_cases/test_calculate_average_price_per_country_
 Xsrc/features/statistics/domain/use_cases/calculate_average_price_per_country_use_case.py,a/3/a36b573ba16dd79a9cc9beace325556f81a8b8d1
 9
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+|
+Lsrc/features/statistics/presentation/average_price_per_country_view_model.py,1/3/134bc609327f83d07ceae12ab42209676077aa04
+J
+src/big_mac_application.py,3/a/3ae11f6699325324ea3da3868d66e12e2d019ecc
