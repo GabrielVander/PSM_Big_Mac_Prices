@@ -50,10 +50,10 @@ class MainMenu:
                 display_message='Get cheapest country on average',
                 on_select=self._get_cheapest_country_on_average,
             ),
-            _SyncOption(
+            _AsyncOption(
                 id=5,
-                display_message='Calculate price change per country (WIP)',
-                on_select=lambda: None,
+                display_message='Calculate price change per country',
+                on_select=self._calculate_price_change_per_country,
             ),
         ]
 
@@ -114,6 +114,14 @@ class MainMenu:
         average_price_view_model: AveragePricePerCountryViewModel = average_prices_ok_result.value
 
         self._display_average_prices(average_price_view_model)
+
+    async def _calculate_price_change_per_country(self):
+        delimiter: str = '-' * 50
+
+        for p in await self._statistics_controller.get_price_change_per_country():
+            print(delimiter)
+            print(f'Country: {p.country_name}')
+            print(f'Percentage: {p.percentage_change}')
 
     @staticmethod
     async def _execute_async_option(option: _Option) -> None:

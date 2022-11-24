@@ -14,16 +14,22 @@ from src.core.domain.use_cases.load_prices_use_case import (
 from src.core.utils.option import Option, Some
 from src.core.utils.result import Error, Ok, Result
 from src.features.statistics.domain.entities.average_price_entry import AveragePriceEntry
+from src.features.statistics.domain.entities.country_extremes import CountryExtremes
+from src.features.statistics.domain.entities.price_change import PriceChange
 from src.features.statistics.domain.use_cases.calculate_average_price_per_country_use_case import (
     CalculateAveragePricePerCountryUseCase, CalculateAveragePriceUseCaseFailure,
 )
 from src.features.statistics.domain.use_cases.calculate_cheapest_country_use_case import CalculateCheapestCountryUseCase
 from src.features.statistics.domain.use_cases.calculate_most_expensive_country_use_case import \
     CalculateMostExpensiveCountryUseCase
+from src.features.statistics.domain.use_cases.calculate_price_change_use_case import CalculatePriceChangeUseCase
+from src.features.statistics.domain.use_cases.get_extremities_per_country_use_case import \
+    GetExtremitiesPerCountryUseCase
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
 )
 from src.features.statistics.presentation.most_expensive_country_view_model import MessageViewModel
+from src.features.statistics.presentation.price_change_view_model import PriceChangeViewModel
 from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 
 
@@ -32,6 +38,8 @@ class StatisticsController:
     _load_prices_use_case: LoadPricesUseCase
     _most_expensive_country_use_case: CalculateMostExpensiveCountryUseCase
     _cheapest_country_use_case: CalculateCheapestCountryUseCase
+    _get_extremes_per_country_use_case: GetExtremitiesPerCountryUseCase
+    _calculate_price_change_use_case: CalculatePriceChangeUseCase
 
     def __init__(
         self,
@@ -43,6 +51,8 @@ class StatisticsController:
         self._average_price_use_case = average_price_use_case
         self._most_expensive_country_use_case = most_expensive_country_use_case
         self._cheapest_country_use_case = CalculateCheapestCountryUseCase()
+        self._get_extremes_per_country_use_case = GetExtremitiesPerCountryUseCase()
+        self._calculate_price_change_use_case = CalculatePriceChangeUseCase()
 
     async def calculate_average_price(self) -> Result[AveragePricePerCountryViewModel, StatisticsControllerFailure]:
         try:
@@ -138,6 +148,13 @@ class StatisticsController:
                     f'price of USD {cheapest_country.price.value}'
         )
 
+    async def get_price_change_per_country(self) -> list[PriceChangeViewModel]:
+        prices: list[PriceEntry] = await self._load_prices()
+        extremities: list[CountryExtremes] = self._get_extremes_per_country_use_case.execute(prices)
+        price_changes: list[PriceChange] = self._calculate_price_change_use_case.execute(extremities)
+
+        return self._as_price_change_view_models(price_changes)
+
     @staticmethod
     def _handle_load_prices_failure(prices_result: Result[list[PriceEntry], LoadPricesUseCaseFailure]) -> Result:
         prices_err_result: Error[list[PriceEntry], LoadPricesUseCaseFailure] = typing.cast(Error, prices_result)
@@ -185,6 +202,18 @@ class StatisticsController:
         prices: list[PriceEntry] = prices_ok_result.value
 
         return prices
+
+    @staticmethod
+    def _as_price_change_view_models(price_changes: list[PriceChange]) -> list[PriceChangeViewModel]:
+        return [
+            PriceChangeViewModel(
+                country_name=price_change.country.value,
+                percentage_change=f'{"-" if price_change.percentage.is_negative else "+"}'
+                                  f'{price_change.percentage.value:.2f}%',
+            )
+            for price_change in price_changes
+
+        ]
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)

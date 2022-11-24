@@ -53,7 +53,7 @@ class TestMainMenu:
             '2 - Calculate average price per country',
             '3 - Get most expensive country on average',
             '4 - Get cheapest country on average',
-            '5 - Calculate price change per country (WIP)\n',
+            '5 - Calculate price change per country\n',
         ]
         expected_text: str = '\n'.join(expected_lines)
         dummy_input: Callable[[str], str] = self._decoy.mock(func=Callable[[str], str])  # type: ignore
