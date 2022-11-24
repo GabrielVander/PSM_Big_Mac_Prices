@@ -12,7 +12,7 @@ from src.features.price_provisioning.price_provisioning_controller import (
     PriceProvisioningControllerFailure, ProvisionedPricesViewModel,
 )
 from src.features.statistics.presentation.average_price_per_country_view_model import AveragePricePerCountryViewModel
-from src.features.statistics.presentation.most_expensive_country_view_model import MostExpensiveCountryViewModel
+from src.features.statistics.presentation.most_expensive_country_view_model import MessageViewModel
 from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
 
@@ -45,10 +45,10 @@ class MainMenu:
                 display_message='Get most expensive country on average',
                 on_select=self._get_most_expensive_country_on_average,
             ),
-            _SyncOption(
+            _AsyncOption(
                 id=4,
-                display_message='Get cheapest country on average (WIP)',
-                on_select=lambda: None,
+                display_message='Get cheapest country on average',
+                on_select=self._get_cheapest_country_on_average,
             ),
             _SyncOption(
                 id=5,
@@ -125,6 +125,20 @@ class MainMenu:
         sync_option: _SyncOption = typing.cast(_SyncOption, option)
         sync_option.on_select()
 
+    async def _get_most_expensive_country_on_average(self):
+        result: Result[MessageViewModel, StatisticsControllerFailure] = \
+            await self._statistics_controller.get_most_expensive_country()
+
+        if isinstance(result, Ok):
+            view_model: MessageViewModel = result.value
+
+            print(view_model.message)
+
+    async def _get_cheapest_country_on_average(self):
+        view_model: MessageViewModel = await self._statistics_controller.get_cheapest_country()
+
+        print(view_model.message)
+
     @staticmethod
     def _handle_failure(result: Result[typing.Any, typing.Any]) -> None:
         err_result: Error = typing.cast(Error, result)
@@ -142,15 +156,6 @@ class MainMenu:
     @staticmethod
     def _display_average_prices(average_price_view_model: AveragePricePerCountryViewModel) -> None:
         _AveragePriceDisplayer(view_model=average_price_view_model).run()
-
-    async def _get_most_expensive_country_on_average(self):
-        result: Result[MostExpensiveCountryViewModel, StatisticsControllerFailure] = \
-            await self._statistics_controller.get_most_expensive_country()
-
-        if isinstance(result, Ok):
-            view_model: MostExpensiveCountryViewModel = result.value
-
-            print(view_model.message)
 
 
 class _Header:

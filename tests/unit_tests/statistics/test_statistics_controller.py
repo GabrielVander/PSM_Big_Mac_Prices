@@ -25,7 +25,7 @@ from src.features.statistics.domain.use_cases.calculate_most_expensive_country_u
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
 )
-from src.features.statistics.presentation.most_expensive_country_view_model import MostExpensiveCountryViewModel
+from src.features.statistics.presentation.most_expensive_country_view_model import MessageViewModel
 from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
@@ -217,12 +217,12 @@ class TestStatisticsController:
             await self._dummy_load_prices_use_case.execute()
         ).then_return(Result.error(failure))
 
-        result: Result[MostExpensiveCountryViewModel, StatisticsControllerFailure] = await \
+        result: Result[MessageViewModel, StatisticsControllerFailure] = await \
             self._controller.get_most_expensive_country()
 
         assert result.is_err()
 
-        err_result: Error[MostExpensiveCountryViewModel, StatisticsControllerFailure] = typing.cast(Error, result)
+        err_result: Error[MessageViewModel, StatisticsControllerFailure] = typing.cast(Error, result)
 
         assert err_result.value.message == expected_message
 
@@ -243,14 +243,14 @@ class TestStatisticsController:
             self._dummy_most_expensive_country_use_case.execute(avrg_entries)
         ).then_return(Option.empty())
 
-        result: Result[MostExpensiveCountryViewModel, StatisticsControllerFailure] = await \
+        result: Result[MessageViewModel, StatisticsControllerFailure] = await \
             self._controller.get_most_expensive_country()
 
         assert result.is_ok()
 
-        ok_result: Ok[MostExpensiveCountryViewModel, StatisticsControllerFailure] = typing.cast(Ok, result)
+        ok_result: Ok[MessageViewModel, StatisticsControllerFailure] = typing.cast(Ok, result)
 
-        assert ok_result.value == MostExpensiveCountryViewModel(message='Unable to determine most expensive country.')
+        assert ok_result.value == MessageViewModel(message='Unable to determine most expensive country.')
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -261,14 +261,14 @@ class TestStatisticsController:
                     country_name=CountryName(value=''),
                     price=AveragePrice(value=0.0),
                 ),
-                MostExpensiveCountryViewModel(message='The most expensive country is  with an average price of USD 0.0')
+                MessageViewModel(message='The most expensive country is  with an average price of USD 0.0')
             ),
             (
                 SingleCountryPrice(
                     country_name=CountryName(value='M5EMN'),
                     price=AveragePrice(value=8.86),
                 ),
-                MostExpensiveCountryViewModel(
+                MessageViewModel(
                     message='The most expensive country is M5EMN with an average price of USD 8.86'
                 )
             )
@@ -278,7 +278,7 @@ class TestStatisticsController:
     async def test_get_most_expensive_country_should_return_use_case_result(
         self,
         single_country_price: SingleCountryPrice,
-        expected_view_model: MostExpensiveCountryViewModel,
+        expected_view_model: MessageViewModel,
     ) -> None:
         entries: list[PriceEntry] = self._decoy.mock(cls=list[PriceEntry])
         avrg_entries: list[AveragePriceEntry] = self._decoy.mock(cls=list[AveragePriceEntry])
@@ -295,11 +295,11 @@ class TestStatisticsController:
             self._dummy_most_expensive_country_use_case.execute(avrg_entries)
         ).then_return(Option.some(single_country_price))
 
-        result: Result[MostExpensiveCountryViewModel, StatisticsControllerFailure] = await \
+        result: Result[MessageViewModel, StatisticsControllerFailure] = await \
             self._controller.get_most_expensive_country()
 
         assert result.is_ok()
 
-        ok_result: Ok[MostExpensiveCountryViewModel, StatisticsControllerFailure] = typing.cast(Ok, result)
+        ok_result: Ok[MessageViewModel, StatisticsControllerFailure] = typing.cast(Ok, result)
 
         assert ok_result.value == expected_view_model

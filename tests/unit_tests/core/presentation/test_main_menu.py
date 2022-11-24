@@ -16,7 +16,7 @@ from src.features.price_provisioning.price_provisioning_controller import (
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
 )
-from src.features.statistics.presentation.most_expensive_country_view_model import MostExpensiveCountryViewModel
+from src.features.statistics.presentation.most_expensive_country_view_model import MessageViewModel
 from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
@@ -52,7 +52,7 @@ class TestMainMenu:
             '1 - Display raw data',
             '2 - Calculate average price per country',
             '3 - Get most expensive country on average',
-            '4 - Get cheapest country on average (WIP)',
+            '4 - Get cheapest country on average',
             '5 - Calculate price change per country (WIP)\n',
         ]
         expected_text: str = '\n'.join(expected_lines)
@@ -283,9 +283,9 @@ class TestMainMenu:
     @pytest.mark.parametrize(
         'view_model, expected_lines',
         [
-            (MostExpensiveCountryViewModel(message=''), ['']),
+            (MessageViewModel(message=''), ['']),
             (
-                MostExpensiveCountryViewModel(
+                MessageViewModel(
                     message='vertitur prodesset tacimates odio patrioque tamquam dicit tantas lectus decore'
                 ),
                 ['vertitur prodesset tacimates odio patrioque tamquam dicit tantas lectus decore']
@@ -294,7 +294,7 @@ class TestMainMenu:
     )
     async def test_most_expensive_country_should_trigger_and_display_correctly(
         self,
-        view_model: MostExpensiveCountryViewModel,
+        view_model: MessageViewModel,
         expected_lines: list[str],
         monkeypatch: MonkeyPatch,
     ) -> None:

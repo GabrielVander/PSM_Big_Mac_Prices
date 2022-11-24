@@ -17,12 +17,13 @@ from src.features.statistics.domain.entities.average_price_entry import AverageP
 from src.features.statistics.domain.use_cases.calculate_average_price_per_country_use_case import (
     CalculateAveragePricePerCountryUseCase, CalculateAveragePriceUseCaseFailure,
 )
+from src.features.statistics.domain.use_cases.calculate_cheapest_country_use_case import CalculateCheapestCountryUseCase
 from src.features.statistics.domain.use_cases.calculate_most_expensive_country_use_case import \
     CalculateMostExpensiveCountryUseCase
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
 )
-from src.features.statistics.presentation.most_expensive_country_view_model import MostExpensiveCountryViewModel
+from src.features.statistics.presentation.most_expensive_country_view_model import MessageViewModel
 from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 
 
@@ -30,6 +31,7 @@ class StatisticsController:
     _average_price_use_case: CalculateAveragePricePerCountryUseCase
     _load_prices_use_case: LoadPricesUseCase
     _most_expensive_country_use_case: CalculateMostExpensiveCountryUseCase
+    _cheapest_country_use_case: CalculateCheapestCountryUseCase
 
     def __init__(
         self,
@@ -40,6 +42,7 @@ class StatisticsController:
         self._load_prices_use_case = load_prices_use_case
         self._average_price_use_case = average_price_use_case
         self._most_expensive_country_use_case = most_expensive_country_use_case
+        self._cheapest_country_use_case = CalculateCheapestCountryUseCase()
 
     async def calculate_average_price(self) -> Result[AveragePricePerCountryViewModel, StatisticsControllerFailure]:
         try:
@@ -62,7 +65,9 @@ class StatisticsController:
 
         return Result.ok(AveragePricePerCountryViewModel(values=average_price_view_models))
 
-    async def get_most_expensive_country(self) -> Result[MostExpensiveCountryViewModel, StatisticsControllerFailure]:
+    async def get_most_expensive_country(self) -> Result[MessageViewModel, StatisticsControllerFailure]:
+        error_view_model: MessageViewModel = MessageViewModel(message='Unable to determine most expensive country.', )
+
         try:
             prices: list[PriceEntry] = await self._load_prices()
         except _LoadPricesFailure as e:
@@ -72,10 +77,42 @@ class StatisticsController:
             self._average_price_use_case.execute(prices)
 
         if isinstance(average_result, Error):
-            return Result.ok(
-                MostExpensiveCountryViewModel(
-                    message='Unable to determine most expensive country.',
-                )
+            return Result.ok(error_view_model)
+
+        average_ok_result: Ok[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure] = typing.cast(
+            Ok,
+            average_result
+        )
+        average_prices: list[AveragePriceEntry] = average_ok_result.value
+
+        most_expensive_country_option: Option[SingleCountryPrice] = \
+            self._most_expensive_country_use_case.execute(average_prices)
+
+        if most_expensive_country_option.is_empty():
+            return Result.ok(error_view_model)
+
+        most_expensive_country_some: Some[SingleCountryPrice] = typing.cast(Some, most_expensive_country_option)
+        most_expensive_country: SingleCountryPrice = most_expensive_country_some.value
+
+        return Result.ok(
+            MessageViewModel(
+                message=f'The most expensive country is {most_expensive_country.country_name.value} with an average '
+                        f'price of USD {most_expensive_country.price.value}'
+            )
+        )
+
+    async def get_cheapest_country(self) -> MessageViewModel:
+        try:
+            prices: list[PriceEntry] = await self._load_prices()
+        except _LoadPricesFailure as e:
+            return MessageViewModel(message=str(self._handle_load_prices_failure(e.result)), )
+
+        average_result: Result[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure] = \
+            self._average_price_use_case.execute(prices)
+
+        if isinstance(average_result, Error):
+            return MessageViewModel(
+                message='Unable to determine cheapest country.',
             )
 
         average_ok_result: Ok[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure] = typing.cast(
@@ -84,25 +121,21 @@ class StatisticsController:
         )
         average_prices: list[AveragePriceEntry] = average_ok_result.value
 
-        most_expensive_option: Option[SingleCountryPrice] = self._most_expensive_country_use_case.execute(
+        cheapest_option: Option[SingleCountryPrice] = self._cheapest_country_use_case.execute(
             average_prices
         )
 
-        if most_expensive_option.is_empty():
-            return Result.ok(
-                MostExpensiveCountryViewModel(
-                    message='Unable to determine most expensive country.',
-                )
+        if cheapest_option.is_empty():
+            return MessageViewModel(
+                message='Unable to determine cheapest country.',
             )
 
-        some_most_expensive: Some[SingleCountryPrice] = typing.cast(Some, most_expensive_option)
-        most_expensive_country: SingleCountryPrice = some_most_expensive.value
+        some_most_expensive: Some[SingleCountryPrice] = typing.cast(Some, cheapest_option)
+        cheapest_country: SingleCountryPrice = some_most_expensive.value
 
-        return Result.ok(
-            MostExpensiveCountryViewModel(
-                message=f'The most expensive country is {most_expensive_country.country_name.value} with an average '
-                        f'price of USD {most_expensive_country.price.value}'
-            )
+        return MessageViewModel(
+            message=f'The cheapest country is {cheapest_country.country_name.value} with an average '
+                    f'price of USD {cheapest_country.price.value}'
         )
 
     @staticmethod
