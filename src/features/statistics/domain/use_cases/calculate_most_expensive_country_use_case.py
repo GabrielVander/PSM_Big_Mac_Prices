@@ -1,9 +1,23 @@
-from src.core.domain.entities.price_entry import PriceEntry
 from src.core.domain.entities.single_country_price import SingleCountryPrice
 from src.core.utils.option import Option
+from src.features.statistics.domain.entities.average_price_entry import AveragePriceEntry
 
 
 class CalculateMostExpensiveCountryUseCase:
 
-    def execute(self, entries: list[PriceEntry]) -> Option[SingleCountryPrice]:
-        raise NotImplementedError()
+    def execute(self, entries: list[AveragePriceEntry]) -> Option[SingleCountryPrice]:
+        if not entries:
+            return Option.empty()
+
+        most_expensive_country: AveragePriceEntry = self._get_most_expensive_entry(entries)
+
+        return Option.some(
+            SingleCountryPrice(
+                country_name=most_expensive_country.country,
+                price=most_expensive_country.price,
+            )
+        )
+
+    @staticmethod
+    def _get_most_expensive_entry(entries: list[AveragePriceEntry]) -> AveragePriceEntry:
+        return max(entries, key=lambda entry: entry.price.value)

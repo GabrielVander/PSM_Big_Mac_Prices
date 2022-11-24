@@ -16,6 +16,7 @@ from src.features.price_provisioning.price_provisioning_controller import (
 from src.features.statistics.presentation.average_price_per_country_view_model import (
     AveragePricePerCountryViewModel,
 )
+from src.features.statistics.presentation.most_expensive_country_view_model import MostExpensiveCountryViewModel
 from src.features.statistics.presentation.single_country_price_view_model import SingleCountryPriceViewModel
 from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
@@ -50,7 +51,7 @@ class TestMainMenu:
             '0 - Exit',
             '1 - Display raw data',
             '2 - Calculate average price per country',
-            '3 - Get most expensive country on average (WIP)',
+            '3 - Get most expensive country on average',
             '4 - Get cheapest country on average (WIP)',
             '5 - Calculate price change per country (WIP)\n',
         ]
@@ -277,3 +278,41 @@ class TestMainMenu:
         self._decoy.verify(
             dummy_sys_exit()  # type: ignore
         )
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        'view_model, expected_lines',
+        [
+            (MostExpensiveCountryViewModel(message=''), ['']),
+            (
+                MostExpensiveCountryViewModel(
+                    message='vertitur prodesset tacimates odio patrioque tamquam dicit tantas lectus decore'
+                ),
+                ['vertitur prodesset tacimates odio patrioque tamquam dicit tantas lectus decore']
+            ),
+        ]
+    )
+    async def test_most_expensive_country_should_trigger_and_display_correctly(
+        self,
+        view_model: MostExpensiveCountryViewModel,
+        expected_lines: list[str],
+        monkeypatch: MonkeyPatch,
+    ) -> None:
+        expected_text: str = '\n'.join(expected_lines)
+        dummy_input: Callable[[str], str] = self._decoy.mock(func=Callable[[str], str])  # type: ignore
+        mock_stdout: io.StringIO = io.StringIO()
+
+        self._decoy.when(
+            await self._dummy_statistics_controller.get_most_expensive_country()
+        ).then_return(Result.ok(view_model))
+
+        self._decoy.when(
+            dummy_input('\nChoose an option...\n')
+        ).then_return('3')
+
+        monkeypatch.setattr(builtins, 'input', dummy_input)
+        monkeypatch.setattr(sys, 'stdout', mock_stdout)
+
+        await self._menu.run()
+
+        assert expected_text in mock_stdout.getvalue()

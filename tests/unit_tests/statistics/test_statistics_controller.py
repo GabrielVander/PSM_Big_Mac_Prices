@@ -227,15 +227,20 @@ class TestStatisticsController:
         assert err_result.value.message == expected_message
 
     @pytest.mark.asyncio
-    async def test_get_most_expensive_country_should_expected_if_no_prices(self) -> None:
+    async def test_get_most_expensive_country_should_return_expected_if_no_prices(self) -> None:
         entries: list[PriceEntry] = self._decoy.mock(cls=list[PriceEntry])
+        avrg_entries: list[AveragePriceEntry] = self._decoy.mock(cls=list[AveragePriceEntry])
 
         self._decoy.when(
             await self._dummy_load_prices_use_case.execute()
         ).then_return(Result.ok(entries))
 
         self._decoy.when(
-            self._dummy_most_expensive_country_use_case.execute(entries)
+            self._dummy_average_price_use_case.execute(entries)
+        ).then_return(Result.ok(avrg_entries))
+
+        self._decoy.when(
+            self._dummy_most_expensive_country_use_case.execute(avrg_entries)
         ).then_return(Option.empty())
 
         result: Result[MostExpensiveCountryViewModel, StatisticsControllerFailure] = await \
@@ -276,13 +281,18 @@ class TestStatisticsController:
         expected_view_model: MostExpensiveCountryViewModel,
     ) -> None:
         entries: list[PriceEntry] = self._decoy.mock(cls=list[PriceEntry])
+        avrg_entries: list[AveragePriceEntry] = self._decoy.mock(cls=list[AveragePriceEntry])
 
         self._decoy.when(
             await self._dummy_load_prices_use_case.execute()
         ).then_return(Result.ok(entries))
 
         self._decoy.when(
-            self._dummy_most_expensive_country_use_case.execute(entries)
+            self._dummy_average_price_use_case.execute(entries)
+        ).then_return(Result.ok(avrg_entries))
+
+        self._decoy.when(
+            self._dummy_most_expensive_country_use_case.execute(avrg_entries)
         ).then_return(Option.some(single_country_price))
 
         result: Result[MostExpensiveCountryViewModel, StatisticsControllerFailure] = await \

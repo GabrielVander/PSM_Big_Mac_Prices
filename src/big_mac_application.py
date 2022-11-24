@@ -11,6 +11,8 @@ from src.core.presentation.main_menu import MainMenu
 from src.features.price_provisioning.price_provisioning_controller import PriceProvisioningController
 from src.features.statistics.domain.use_cases.calculate_average_price_per_country_use_case import \
     CalculateAveragePricePerCountryUseCase
+from src.features.statistics.domain.use_cases.calculate_most_expensive_country_use_case import \
+    CalculateMostExpensiveCountryUseCase
 from src.features.statistics.statistics_controller import StatisticsController
 
 
@@ -26,30 +28,33 @@ class BigMacApplication:
 
         csv_data_source: CsvDataSource = CsvDataSource(
             csv_file_path=csv_file_path,
-            csv_file_reader=csv_file_reader
+            csv_file_reader=csv_file_reader,
         )
 
         price_repository: PriceRepository = PriceRepositoryImpl(
             csv_data_source=csv_data_source,
-            csv_price_model_mapper=csv_price_mapper
+            csv_price_model_mapper=csv_price_mapper,
         )
 
         load_prices_use_case: LoadPricesUseCase = LoadPricesUseCase(
-            price_repository=price_repository
+            price_repository=price_repository,
         )
-        calculate_average_price_per_country_use_case = CalculateAveragePricePerCountryUseCase()
+        calculate_average_price_per_country_use_case: CalculateAveragePricePerCountryUseCase = \
+            CalculateAveragePricePerCountryUseCase()
+        most_expensive_country_use_case: CalculateMostExpensiveCountryUseCase = CalculateMostExpensiveCountryUseCase()
 
         price_provisioning_controller: PriceProvisioningController = PriceProvisioningController(
             load_prices_use_case=load_prices_use_case
         )
         statistics_controller: StatisticsController = StatisticsController(
             load_prices_use_case=load_prices_use_case,
-            average_price_use_case=calculate_average_price_per_country_use_case
+            average_price_use_case=calculate_average_price_per_country_use_case,
+            most_expensive_country_use_case=most_expensive_country_use_case,
         )
 
         main_menu: MainMenu = MainMenu(
             price_provisioning_controller=price_provisioning_controller,
-            statistics_controller=statistics_controller
+            statistics_controller=statistics_controller,
         )
 
         while True:

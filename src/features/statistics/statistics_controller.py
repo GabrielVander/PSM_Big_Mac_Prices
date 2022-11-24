@@ -68,7 +68,25 @@ class StatisticsController:
         except _LoadPricesFailure as e:
             return self._handle_load_prices_failure(e.result)
 
-        most_expensive_option: Option[SingleCountryPrice] = self._most_expensive_country_use_case.execute(prices)
+        average_result: Result[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure] = \
+            self._average_price_use_case.execute(prices)
+
+        if isinstance(average_result, Error):
+            return Result.ok(
+                MostExpensiveCountryViewModel(
+                    message='Unable to determine most expensive country.',
+                )
+            )
+
+        average_ok_result: Ok[list[AveragePriceEntry], CalculateAveragePriceUseCaseFailure] = typing.cast(
+            Ok,
+            average_result
+        )
+        average_prices: list[AveragePriceEntry] = average_ok_result.value
+
+        most_expensive_option: Option[SingleCountryPrice] = self._most_expensive_country_use_case.execute(
+            average_prices
+        )
 
         if most_expensive_option.is_empty():
             return Result.ok(

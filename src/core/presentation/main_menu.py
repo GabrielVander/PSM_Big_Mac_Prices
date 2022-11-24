@@ -12,6 +12,7 @@ from src.features.price_provisioning.price_provisioning_controller import (
     PriceProvisioningControllerFailure, ProvisionedPricesViewModel,
 )
 from src.features.statistics.presentation.average_price_per_country_view_model import AveragePricePerCountryViewModel
+from src.features.statistics.presentation.most_expensive_country_view_model import MostExpensiveCountryViewModel
 from src.features.statistics.statistics_controller import StatisticsController, StatisticsControllerFailure
 
 
@@ -39,10 +40,10 @@ class MainMenu:
                 display_message='Calculate average price per country',
                 on_select=self._calculate_average_prices,
             ),
-            _SyncOption(
+            _AsyncOption(
                 id=3,
-                display_message='Get most expensive country on average (WIP)',
-                on_select=lambda: None,
+                display_message='Get most expensive country on average',
+                on_select=self._get_most_expensive_country_on_average,
             ),
             _SyncOption(
                 id=4,
@@ -141,6 +142,15 @@ class MainMenu:
     @staticmethod
     def _display_average_prices(average_price_view_model: AveragePricePerCountryViewModel) -> None:
         _AveragePriceDisplayer(view_model=average_price_view_model).run()
+
+    async def _get_most_expensive_country_on_average(self):
+        result: Result[MostExpensiveCountryViewModel, StatisticsControllerFailure] = \
+            await self._statistics_controller.get_most_expensive_country()
+
+        if isinstance(result, Ok):
+            view_model: MostExpensiveCountryViewModel = result.value
+
+            print(view_model.message)
 
 
 class _Header:

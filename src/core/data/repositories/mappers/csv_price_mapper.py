@@ -22,7 +22,7 @@ class CsvPriceMapper:
 
     def _to_entity(self, model):
         return PriceEntry(
-            country_name=CountryName(value=model.name),
+            country_name=CountryName(value=model.name.strip()),
             price=Price(
                 original_currency=OriginalCurrency(value=model.currency_code),
                 amount_in_original_currency=Amount(value=model.local_price),
