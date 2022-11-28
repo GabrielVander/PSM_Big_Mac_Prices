@@ -1,5 +1,5 @@
-from src.core.domain.entities.price import Amount
-from src.core.domain.entities.price_entry import CountryName, PriceEntry
+from src.features.price_loading.entities.price import Amount
+from src.features.price_loading.entities.price_entry import CountryName, PriceEntry
 from src.features.statistics.domain.entities.country_extremes import CountryExtremes
 
 

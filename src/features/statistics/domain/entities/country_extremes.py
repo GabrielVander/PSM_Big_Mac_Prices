@@ -1,7 +1,7 @@
 import dataclasses
 
-from src.core.domain.entities.price import Amount
-from src.core.domain.entities.price_entry import CountryName
+from src.features.price_loading.entities.price import Amount
+from src.features.price_loading.entities.price_entry import CountryName
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)

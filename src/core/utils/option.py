@@ -35,16 +35,16 @@ class Some(Option[_T]):
         return self._value
 
     def is_some(self) -> bool:
-        return True
+        return True  # pragma: nocover
 
     def is_empty(self) -> bool:
-        return False
+        return False  # pragma: nocover
 
 
 class Empty(Option[_T]):
 
     def is_some(self) -> bool:
-        return False
+        return False  # pragma: nocover
 
     def is_empty(self) -> bool:
-        return True
+        return True  # pragma: nocover

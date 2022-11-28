@@ -4,9 +4,9 @@ from collections.abc import Generator
 
 import pytest
 
-from src.core.domain.entities.price import Amount, ExchangeRate, OriginalCurrency, Price
-from src.core.domain.entities.price_entry import CountryName, PriceEntry
 from src.core.utils.result import Ok, Result
+from src.features.price_loading.entities.price import Amount, ExchangeRate, OriginalCurrency, Price
+from src.features.price_loading.entities.price_entry import CountryName, PriceEntry
 from src.features.statistics.domain.entities.average_price_entry import AveragePrice, AveragePriceEntry
 from src.features.statistics.domain.use_cases.calculate_average_price_per_country_use_case import (
     CalculateAveragePricePerCountryUseCase, CalculateAveragePriceUseCaseFailure,

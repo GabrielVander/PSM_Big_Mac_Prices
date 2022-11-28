@@ -1,6 +1,6 @@
-from src.core.domain.entities.single_country_price import SingleCountryPrice
 from src.core.utils.option import Option
 from src.features.statistics.domain.entities.average_price_entry import AveragePriceEntry
+from src.features.statistics.domain.entities.single_country_price import SingleCountryPrice
 
 
 class CalculateMostExpensiveCountryUseCase:

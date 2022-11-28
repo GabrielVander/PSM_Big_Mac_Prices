@@ -1,19 +1,22 @@
 import pathlib
 
 import constants
-from src.core.data.data_sources.csv_data_source import CsvDataSource
-from src.core.data.data_sources.utils.csv_file_reader import CsvFileReader
-from src.core.data.repositories.mappers.csv_price_mapper import CsvPriceMapper
-from src.core.data.repositories.price_repository_impl import PriceRepositoryImpl
-from src.core.domain.repository.price_repository import PriceRepository
-from src.core.domain.use_cases.load_prices_use_case import LoadPricesUseCase
 from src.core.presentation.main_menu import MainMenu
-from src.features.price_provisioning.price_provisioning_controller import PriceProvisioningController
+from src.core.presentation.main_menu_controller import MainMenuController
+from src.features.price_loading.data.data_sources.csv_data_source import CsvDataSource
+from src.features.price_loading.data.data_sources.utils.csv_file_reader import CsvFileReader
+from src.features.price_loading.data.repositories.mappers.csv_price_mapper import CsvPriceMapper
+from src.features.price_loading.data.repositories.price_repository_impl import PriceRepositoryImpl
+from src.features.price_loading.domain.use_cases.load_prices_use_case import LoadPricesUseCase
+from src.features.price_loading.repository.price_repository import PriceRepository
 from src.features.statistics.domain.use_cases.calculate_average_price_per_country_use_case import \
     CalculateAveragePricePerCountryUseCase
+from src.features.statistics.domain.use_cases.calculate_cheapest_country_use_case import CalculateCheapestCountryUseCase
 from src.features.statistics.domain.use_cases.calculate_most_expensive_country_use_case import \
     CalculateMostExpensiveCountryUseCase
-from src.features.statistics.statistics_controller import StatisticsController
+from src.features.statistics.domain.use_cases.calculate_price_change_use_case import CalculatePriceChangeUseCase
+from src.features.statistics.domain.use_cases.get_extremities_per_country_use_case import \
+    GetExtremitiesPerCountryUseCase
 
 
 class BigMacApplication:
@@ -42,19 +45,21 @@ class BigMacApplication:
         calculate_average_price_per_country_use_case: CalculateAveragePricePerCountryUseCase = \
             CalculateAveragePricePerCountryUseCase()
         most_expensive_country_use_case: CalculateMostExpensiveCountryUseCase = CalculateMostExpensiveCountryUseCase()
+        cheapest_country_use_case: CalculateCheapestCountryUseCase = CalculateCheapestCountryUseCase()
+        get_extremities_use_case: GetExtremitiesPerCountryUseCase = GetExtremitiesPerCountryUseCase()
+        calculate_price_change_use_case: CalculatePriceChangeUseCase = CalculatePriceChangeUseCase()
 
-        price_provisioning_controller: PriceProvisioningController = PriceProvisioningController(
-            load_prices_use_case=load_prices_use_case
-        )
-        statistics_controller: StatisticsController = StatisticsController(
+        main_menu_controller: MainMenuController = MainMenuController(
             load_prices_use_case=load_prices_use_case,
-            average_price_use_case=calculate_average_price_per_country_use_case,
-            most_expensive_country_use_case=most_expensive_country_use_case,
+            calculate_average_price_per_country_use_case=calculate_average_price_per_country_use_case,
+            calculate_most_expensive_country_use_case=most_expensive_country_use_case,
+            calculate_cheapest_country_use_case=cheapest_country_use_case,
+            get_extremities_per_country_use_case=get_extremities_use_case,
+            calculate_price_change_use_case=calculate_price_change_use_case,
         )
 
         main_menu: MainMenu = MainMenu(
-            price_provisioning_controller=price_provisioning_controller,
-            statistics_controller=statistics_controller,
+            main_menu_controller=main_menu_controller,
         )
 
         while True:
