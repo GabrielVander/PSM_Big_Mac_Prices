@@ -73,16 +73,6 @@ class TestPriceRepositoryImpl:
 
         assert actual_entities == expected_entities
 
-        self._decoy.verify(
-            await self._dummy_csv_data_source.load(),
-            times=1
-        )
-
-        self._decoy.verify(
-            self._dummy_csv_price_model_mapper.map(decoy.matchers.IsA(CsvPriceModel)),
-            times=amount_of_entries
-        )
-
     @pytest.mark.asyncio
     async def test_fetch_should_return_generic_failure_if_data_source_failure(self) -> None:
         data_source_failure: CsvDataSourceFailure = self._decoy.mock(cls=CsvDataSourceFailure)
@@ -172,16 +162,6 @@ class TestPriceRepositoryImpl:
 
         assert len(actual_entities) == amount_of_entries - len(indexes_with_defect)
         assert actual_entities == expected_entities
-
-        self._decoy.verify(
-            await self._dummy_csv_data_source.load(),
-            times=1
-        )
-
-        self._decoy.verify(
-            self._dummy_csv_price_model_mapper.map(decoy.matchers.IsA(CsvPriceModel)),
-            times=amount_of_entries
-        )
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
